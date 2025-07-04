@@ -5,6 +5,7 @@ import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
+import jakarta.servlet.http.HttpServletRequest;
 import lombok.AllArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -12,6 +13,7 @@ import org.springframework.stereotype.Service;
 
 import javax.crypto.KeyGenerator;
 import javax.crypto.SecretKey;
+import java.net.http.HttpHeaders;
 import java.security.NoSuchAlgorithmException;
 import java.util.Base64;
 import java.util.Date;
@@ -93,5 +95,13 @@ public class JwtService {
                 .signWith(getKey(jwtSecretKey.trim()))
                 .compact();
     };
+
+    public String extractEmail(HttpServletRequest request){
+        String authHeader=request.getHeader("Authorization");
+        if(authHeader ==null || !authHeader.startsWith("Bearer ")) return null;
+        String token=authHeader.substring(7).trim();
+        System.out.println("EXTRACTED TOKEN" +token);
+        return extractUsername(token);
+    }
 
 }

@@ -52,12 +52,13 @@ public class UserDtoService implements IUserDtoService {
         userDto.setUser_id(user.getUser_id());
         userDto.setEmail(user.getEmail());
         userDto.setLastname(user.getLastname());
-        userDto.setUsername(user.getUsername());
         userDto.setImg(user.getImg());
         userDto.setPosts(user.getPosts());
         userDto.setIsLoggedIn(false);
         userDto.setNum_posts(user.getNum_posts());
+        userDto.setRole(user.getRole());
         userDto.onCreate();
+
         return userDto;
     };
     public UserDtoNoPosts convertUserNoPosts(User_ user){

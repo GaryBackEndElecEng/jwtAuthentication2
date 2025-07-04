@@ -19,6 +19,7 @@ import org.springframework.security.config.annotation.authentication.configurati
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
+import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
@@ -28,6 +29,9 @@ import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
 import java.util.List;
+
+import static org.springframework.web.bind.annotation.RequestMethod.POST;
+import static org.springframework.web.bind.annotation.RequestMethod.PUT;
 
 @Configuration
 @EnableWebSecurity
@@ -53,13 +57,16 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception{
         http
-                .csrf(csrf->csrf.disable())
+                .csrf(AbstractHttpConfigurer::disable)
                 .sessionManagement(httpSecurity->
                         httpSecurity.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(authorizeRequest->
                         authorizeRequest.requestMatchers(HttpMethod.POST,"/api/auth/**").permitAll()
-                                .requestMatchers(HttpMethod.GET,"/api/test/**").permitAll()
-                                .anyRequest().authenticated()
+                                .requestMatchers(HttpMethod.GET,"/api/test/**","/api/users/**","/api/posts/**").permitAll()
+                                .requestMatchers(HttpMethod.POST,"/api/posts","/api/tasks/**").authenticated()
+                                .requestMatchers(HttpMethod.PUT,"/api/posts","/api/tasks/**").authenticated()
+                                .requestMatchers(HttpMethod.DELETE,"/api/posts","/api/tasks/**").authenticated()
+                                .anyRequest().permitAll()
                 ).authenticationProvider(authenticationProvider())
                 .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
 

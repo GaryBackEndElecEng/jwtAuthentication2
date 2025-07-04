@@ -44,7 +44,6 @@ public class SigninService implements ISigninService {
         userToken.setEmail(user.getEmail());
         userToken.setImg(user.getImg());
         userToken.setLastname(user.getLastname());
-        userToken.setUsername(user.getUsername());
         userToken.setPosts(user.getPosts());
         userToken.setRegistered(true);
         userToken.setToken(token);

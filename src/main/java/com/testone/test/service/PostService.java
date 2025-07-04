@@ -6,20 +6,31 @@ import com.testone.test.model.Post;
 import com.testone.test.model.User_;
 import com.testone.test.repository.PostRepo;
 import com.testone.test.repository.UserRepo;
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.java.Log;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
+import org.springframework.web.context.request.RequestContextHolder;
 
 import java.util.List;
 
 @Transactional
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class PostService implements IPostService{
 
     private final PostRepo postRepo;
     private final UserRepo userRepo;
     private final PostDtoService postDtoService;
+    private final JwtService jwtService;
+    @Autowired
+    public HttpServletRequest request;
 
     @Override
     public List<PostDto> getAllPosts() {
@@ -43,11 +54,21 @@ public class PostService implements IPostService{
     @Override
     public PostDto savePost(Post post, Long userId) {
         //GET USER,IF NO USER=>user_id=null=> save post
-        userRepo.findById(userId)
-                .stream().findFirst().
-                ifPresent(user -> user.addPost(post));
+
+        log.debug("this is savePost()-{}",request);
+        System.out.println("REQUEST:=>" +request);
+
+        String userEmail=jwtService.extractEmail(request);
+        User_ user=userRepo.findById(userId)
+                .stream().findFirst()
+                        .filter(user_->user_.getEmail().equals(userEmail))
+                .orElseThrow(()->new ResourceNotFound("no user by ID OR not authorized"));
+        if(user!=null){
+            user.addPost(post);
+            return postDtoService.convertPostDto(postRepo.save(post));
+        }
+        return null;
         //if NO user then get
-        return postDtoService.convertPostDto(postRepo.save(post));
     }
 
     @Override

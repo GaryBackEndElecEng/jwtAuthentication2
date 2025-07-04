@@ -35,7 +35,7 @@ public class UserController {
         }
     };
 
-    @PreAuthorize("hasRole('USER','ADMIN)")
+    @PreAuthorize("hasAnyRole('USER','ADMIN')")
     @PostMapping("/post")
     ResponseEntity<ApiResponse> addUser(@RequestBody  User_ user){
         try {
@@ -47,6 +47,7 @@ public class UserController {
         }
     };
 
+    @PreAuthorize("hasAnyRole('USER','ADMIN')")
     @PutMapping("/put")
     ResponseEntity<ApiResponse> updateUser(@RequestBody  User_ user){
         try {
@@ -78,7 +79,7 @@ public class UserController {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new ApiResponse(null,e.getMessage()));
         }
     };
-
+    @PreAuthorize("hasAnyRole('USER','ADMIN')")
     @DeleteMapping("/delete/{userId}")
     ResponseEntity<ApiResponse> deleteUser(@PathVariable  Long userId){
             String msg=userService.deleteUser(userId);
